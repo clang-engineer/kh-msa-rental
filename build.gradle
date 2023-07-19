@@ -128,6 +128,21 @@ task integrationTestReport(type: TestReport) {
     reportOn integrationTest
 }
 
+liquibase {
+    activities {
+        main {
+            driver "org.h2.Driver"
+            url "jdbc:h2:file:./build/h2db/db/rental"
+            username "rental"
+            password ""
+            changeLogFile "src/main/resources/config/liquibase/master.xml"
+            defaultSchemaName ""
+            logLevel "debug"
+            classpath "src/main/resources/"
+        }
+    }
+
+}
 
 gitProperties {
     failOnNoGitDirectory = false
@@ -236,6 +251,7 @@ dependencies {
     implementation "io.micrometer:micrometer-registry-prometheus"
     implementation "io.dropwizard.metrics:metrics-core"
     liquibaseRuntime sourceSets.main.compileClasspath
+    liquibaseRuntime "org.liquibase.ext:liquibase-hibernate5:${liquibaseHibernate5Version}"
     OperatingSystem os = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem();
     Architecture arch = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentArchitecture();
     if (os.isMacOsX() && !arch.isAmd64()) {
@@ -267,6 +283,9 @@ task cleanResources(type: Delete) {
 wrapper {
     gradleVersion = "7.4.2"
 }
+
+
+
 
 
 compileJava.dependsOn processResources
