@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20230720052137-1" author="jhipster">
+        <createTable tableName="returned_item">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="book_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="returned_date" type="date">
+                <constraints nullable="true" />
+            </column>
+            <column name="book_title" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="rental_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="rental_id"
+                                 baseTableName="returned_item"
+                                 constraintName="fk_returned_item__rental_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="rental"/>
+    </changeSet>
+
+    <changeSet id="20230720052137-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/returned_item.csv"
+                  separator=";"
+                  tableName="returned_item"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="book_id" type="numeric"/>
+            <column name="returned_date" type="date"/>
+            <column name="due_date" type="date"/>
+            <column name="book_title" type="varchar(255)"/>
+            <column name="rental_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

@@ -1,10 +1,16 @@
 package com.hhkbdev.rental.domain
 
 import com.hhkbdev.rental.domain.enumeration.RentalStatus
+import com.hhkbdev.rental.web.rest.errors.RentUnavailableException
+import org.hibernate.annotations.Cache
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.io.Serializable
+import java.time.LocalDate
+import javax.persistence.CascadeType
+import javax.persistence.OneToMany
 
 /**
  * A Rental.
@@ -12,16 +18,26 @@ import java.io.Serializable
 @Table("rental")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 data class Rental(
-
     @Id
     @Column("id")
     var id: Long? = null,
+
     @Column("user_id")
     var userId: Long? = null,
+
     @Column("rental_status")
     var rentalStatus: RentalStatus? = null,
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    @Column("late_fee")
+    var lateFee: Long? = null,
+
+    @OneToMany(mappedBy = "rental", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    var rentedItems: MutableSet<RentedItem> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "rental", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    var returnedItems: MutableSet<ReturnedItem> = mutableSetOf()
 ) : Serializable {
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -44,7 +60,46 @@ data class Rental(
             "}"
     }
 
+    fun checkRentalAvailable(): Boolean {
+        if (rentalStatus === RentalStatus.RENT_UNAVAILABLE || lateFee != 0L) {
+            throw RentUnavailableException("Rent is unavailable")
+        }
+
+        if (rentedItems.size >= 5) {
+            throw RentUnavailableException("Rent is unavailable")
+        }
+        return true
+    }
+
+    fun rentBook(bookId: Long, title: String): Rental {
+        checkRentalAvailable()
+        rentedItems.add(RentedItem.createRentedItem(bookId, title, LocalDate.now()))
+
+        return this
+    }
+
+    fun returnBook(bookId: Long): Rental {
+        val rentedItem = rentedItems.find { it.bookId == bookId }
+        returnedItems.add(
+            ReturnedItem.createReturnedItem(
+                rentedItem?.bookId,
+                rentedItem?.bookTitle,
+                LocalDate.now()
+            )
+        )
+        rentedItems.remove(rentedItem)
+        return this
+    }
+
     companion object {
         private const val serialVersionUID = 1L
+
+        fun createRental(userId: Long): Rental {
+            return Rental().apply {
+                this.userId = userId
+                this.rentalStatus = RentalStatus.RENT_AVAILABLE
+                this.lateFee = 0
+            }
+        }
     }
 }

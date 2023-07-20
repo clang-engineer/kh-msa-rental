@@ -1,19 +1,14 @@
 package com.hhkbdev.rental.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.io.Serializable
 import java.time.LocalDate
-import javax.persistence.ManyToOne
 
-/**
- * A RentedItem.
- */
-@Table("rented_item")
+@Table("returned_item")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-data class RentedItem(
+data class ReturnedItem(
     @Id
     @Column("id")
     var id: Long? = null,
@@ -21,29 +16,20 @@ data class RentedItem(
     @Column("book_id")
     var bookId: Long? = null,
 
-    @Column("rented_date")
-    var rentedDate: LocalDate? = null,
-
-    @Column("due_date")
-    var dueDate: LocalDate? = null,
+    @Column("returned_date")
+    var returnedDate: LocalDate? = null,
 
     @Column("book_title")
     var bookTitle: String? = null,
 
-    @ManyToOne
-    @JsonIgnoreProperties("rentedItems")
-    var rental: Rental? = null,
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 ) : Serializable {
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is RentedItem) return false
+        if (other !is ReturnedItem) return false
         return id != null && other.id != null && id == other.id
     }
 
@@ -51,20 +37,19 @@ data class RentedItem(
         return "RentedItem{" +
             "id=" + id +
             ", bookId=" + bookId +
-            ", rentedDate='" + rentedDate + "'" +
-            ", dueDate='" + dueDate + "'" +
+            ", returnedDate='" + returnedDate + "'" +
+            ", bookTitle='" + bookTitle + "'" +
             "}"
     }
 
     companion object {
         private const val serialVersionUID = 1L
 
-        fun createRentedItem(bookId: Long?, bookTitle: String?, rentedDate: LocalDate): RentedItem {
-            return RentedItem().apply {
+        fun createReturnedItem(bookId: Long?, bookTitle: String?, returnedDate: LocalDate): ReturnedItem {
+            return ReturnedItem().apply {
                 this.bookId = bookId
                 this.bookTitle = bookTitle
-                this.rentedDate = rentedDate
-                this.dueDate = rentedDate.plusWeeks(2)
+                this.returnedDate = returnedDate
             }
         }
     }
