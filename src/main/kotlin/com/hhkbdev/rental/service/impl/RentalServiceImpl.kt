@@ -85,7 +85,7 @@ class RentalServiceImpl(
             }
     }
 
-    override fun returnBook(userId: Long, bookId: Long, bookTitle: String): Mono<RentalDTO> {
+    override fun returnBook(userId: Long, bookId: Long): Mono<RentalDTO> {
         return rentalRepository.findByUserId(userId)
             .flatMap {
                 it.checkRentalAvailable()

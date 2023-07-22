@@ -1,5 +1,4 @@
 package com.hhkbdev.rental.service
-import com.hhkbdev.rental.domain.Rental
 import com.hhkbdev.rental.service.dto.RentalDTO
 import org.springframework.data.domain.Pageable
 import reactor.core.publisher.Flux
@@ -23,5 +22,5 @@ interface RentalService {
 
     fun rentBook(userId: Long, bookId: Long, bookTitle: String): Mono<RentalDTO>
 
-    fun returnBook(userId: Long, bookId: Long, bookTitle: String): Mono<RentalDTO>
+    fun returnBook(userId: Long, bookId: Long): Mono<RentalDTO>
 }

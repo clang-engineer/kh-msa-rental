@@ -1,5 +1,6 @@
 package com.hhkbdev.rental.web.rest
 
+import com.hhkbdev.rental.adapter.BookClient
 import com.hhkbdev.rental.repository.RentalRepository
 import com.hhkbdev.rental.service.RentalService
 import com.hhkbdev.rental.service.dto.RentalDTO
@@ -20,7 +21,7 @@ import tech.jhipster.web.util.PaginationUtil
 import tech.jhipster.web.util.reactive.ResponseUtil
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.Objects
+import java.util.*
 
 private const val ENTITY_NAME = "rentalRental"
 /**
@@ -31,6 +32,7 @@ private const val ENTITY_NAME = "rentalRental"
 class RentalResource(
     private val rentalService: RentalService,
     private val rentalRepository: RentalRepository,
+    private val bookClient: BookClient
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -201,6 +203,39 @@ class RentalResource(
                 Mono.just(
                     ResponseEntity.noContent()
                         .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build<Void>()
+                )
+            )
+    }
+
+    @PostMapping("/rentals/{userid}/rented-item/{bookid}")
+    fun rentBook(@PathVariable userid: Long, @PathVariable bookid: Long): Mono<ResponseEntity<RentalDTO>> {
+        log.debug("REST request to rent book : $bookid")
+
+        return bookClient.getBookInfo(bookid)
+            .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))
+            .flatMap {
+                Mono.just(it.body)
+            }
+            .flatMap {
+                rentalService.rentBook(userid, it.id!!, it.title!!)
+            }
+            .map {
+                ResponseEntity.ok()
+                    .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, it.id.toString()))
+                    .body(it)
+            }
+
+    }
+
+    @DeleteMapping("/rentals/{userid}/rented-item/{bookid}")
+    fun returnBook(@PathVariable userid: Long, @PathVariable bookid: Long): Mono<ResponseEntity<Void>> {
+        log.debug("REST request to return book : $bookid")
+
+        return rentalService.returnBook(userid, bookid)
+            .then(
+                Mono.just(
+                    ResponseEntity.noContent()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, bookid.toString())).build<Void>()
                 )
             )
     }
