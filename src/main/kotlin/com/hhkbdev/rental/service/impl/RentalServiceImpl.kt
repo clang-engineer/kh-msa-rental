@@ -68,4 +68,36 @@ class RentalServiceImpl(
         log.debug("Request to delete Rental : $id")
         return rentalRepository.deleteById(id)
     }
+
+    override fun rentBook(userId: Long, bookId: Long, bookTitle: String): Mono<RentalDTO> {
+        return rentalRepository.findByUserId(userId)
+            .flatMap {
+                it.checkRentalAvailable()
+                it.rentBook(bookId, bookTitle)
+                rentalRepository.save(it)
+            }
+            .flatMap {
+                // todo: send event
+                Mono.just(it)
+            }
+            .map {
+                rentalMapper.toDto(it)
+            }
+    }
+
+    override fun returnBook(userId: Long, bookId: Long, bookTitle: String): Mono<RentalDTO> {
+        return rentalRepository.findByUserId(userId)
+            .flatMap {
+                it.checkRentalAvailable()
+                it.returnBook(bookId)
+                rentalRepository.save(it)
+            }
+            .flatMap {
+                // todo: send event
+                Mono.just(it)
+            }
+            .map {
+                rentalMapper.toDto(it)
+            }
+    }
 }

@@ -23,6 +23,8 @@ interface RentalRepository : ReactiveCrudRepository<Rental, Long>, RentalReposit
     override fun findById(id: Long?): Mono<Rental>
 
     override fun deleteById(id: Long): Mono<Void>
+
+    fun findByUserId(userId: Long): Mono<Rental>
 }
 
 interface RentalRepositoryInternal {
