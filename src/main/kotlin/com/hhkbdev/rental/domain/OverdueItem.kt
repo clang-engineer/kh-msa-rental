@@ -8,21 +8,15 @@ import java.io.Serializable
 import java.time.LocalDate
 import javax.persistence.ManyToOne
 
-/**
- * A RentedItem.
- */
-@Table("rented_item")
+@Table("overdue_item")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-data class RentedItem(
+data class OverdueItem(
     @Id
     @Column("id")
     var id: Long? = null,
 
     @Column("book_id")
     var bookId: Long? = null,
-
-    @Column("rented_date")
-    var rentedDate: LocalDate? = null,
 
     @Column("due_date")
     var dueDate: LocalDate? = null,
@@ -31,37 +25,36 @@ data class RentedItem(
     var bookTitle: String? = null,
 
     @ManyToOne
-    @JsonIgnoreProperties("rentedItems")
+    @JsonIgnoreProperties("overdueItems")
     var rental: Rental? = null,
 ) : Serializable {
+
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is RentedItem) return false
+        if (other !is OverdueItem) return false
         return id != null && other.id != null && id == other.id
     }
 
     override fun toString(): String {
         return "RentedItem{" +
-            "id=" + id +
-            ", bookId=" + bookId +
-            ", rentedDate='" + rentedDate + "'" +
-            ", dueDate='" + dueDate + "'" +
-            "}"
+                "id=" + id +
+                ", bookId=" + bookId +
+                ", dueDate='" + dueDate + "'" +
+                "}"
     }
 
     companion object {
         private const val serialVersionUID = 1L
 
-        fun createRentedItem(bookId: Long?, bookTitle: String?, rentedDate: LocalDate): RentedItem {
-            return RentedItem().apply {
+        fun createOverdueItem(bookId: Long?, bookTitle: String?, dueDate: LocalDate?): OverdueItem {
+            return OverdueItem().apply {
                 this.bookId = bookId
                 this.bookTitle = bookTitle
-                this.rentedDate = rentedDate
-                this.dueDate = rentedDate.plusWeeks(2)
+                this.dueDate = dueDate
             }
         }
     }
