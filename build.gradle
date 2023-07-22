@@ -262,6 +262,10 @@ dependencies {
         }
     }
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 if (project.hasProperty("gae")) {
