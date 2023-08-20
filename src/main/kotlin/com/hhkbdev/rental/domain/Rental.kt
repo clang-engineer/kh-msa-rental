@@ -7,7 +7,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
-import reactor.core.publisher.Mono
 import java.io.Serializable
 import java.time.LocalDate
 import javax.persistence.CascadeType
@@ -97,12 +96,12 @@ data class Rental(
     companion object {
         private const val serialVersionUID = 1L
 
-        fun createRental(userId: Long): Mono<Rental> {
-            return Mono.just(Rental().apply {
-                this.userId = userId
-                this.rentalStatus = RentalStatus.RENT_AVAILABLE
-                this.lateFee = 0
-            })
+        fun createRental(userId: Long): Rental {
+            return Rental(
+                userId = userId,
+                rentalStatus = RentalStatus.RENT_AVAILABLE,
+                lateFee = 0
+            )
         }
     }
 }

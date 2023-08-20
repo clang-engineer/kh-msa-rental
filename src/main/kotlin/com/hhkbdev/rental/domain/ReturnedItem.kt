@@ -46,11 +46,7 @@ data class ReturnedItem(
         private const val serialVersionUID = 1L
 
         fun createReturnedItem(bookId: Long?, bookTitle: String?, returnedDate: LocalDate): ReturnedItem {
-            return ReturnedItem().apply {
-                this.bookId = bookId
-                this.bookTitle = bookTitle
-                this.returnedDate = returnedDate
-            }
+            return ReturnedItem(bookId = bookId, bookTitle = bookTitle, returnedDate = returnedDate)
         }
     }
 }

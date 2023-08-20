@@ -196,13 +196,13 @@ class RentalResource(
      * @return the [ResponseEntity] with status `204 (NO_CONTENT)`.
      */
     @DeleteMapping("/rentals/{id}")
-    fun deleteRental(@PathVariable id: Long): Mono<ResponseEntity<Void>> {
+    fun deleteRental(@PathVariable id: Long): Mono<ResponseEntity<Unit>> {
         log.debug("REST request to delete Rental : $id")
         return rentalService.delete(id)
             .then(
                 Mono.just(
                     ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build<Void>()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build()
                 )
             )
     }
@@ -213,8 +213,8 @@ class RentalResource(
 
         return bookClient.getBookInfo(bookid)
             .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))
-            .flatMap {
-                Mono.just(it.body)
+            .map {
+                it.body
             }
             .flatMap {
                 rentalService.rentBook(userid, it.id!!, it.title!!)
@@ -228,14 +228,14 @@ class RentalResource(
     }
 
     @DeleteMapping("/rentals/{userid}/rented-item/{bookid}")
-    fun returnBook(@PathVariable userid: Long, @PathVariable bookid: Long): Mono<ResponseEntity<Void>> {
+    fun returnBook(@PathVariable userid: Long, @PathVariable bookid: Long): Mono<ResponseEntity<Unit>> {
         log.debug("REST request to return book : $bookid")
 
         return rentalService.returnBook(userid, bookid)
             .then(
                 Mono.just(
                     ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, bookid.toString())).build<Void>()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, bookid.toString())).build()
                 )
             )
     }

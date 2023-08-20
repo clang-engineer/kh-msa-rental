@@ -76,9 +76,12 @@ class RentalServiceImpl(
                 it.rentBook(bookId, bookTitle)
                 rentalRepository.save(it)
             }
-            .flatMap {
+            .map {
                 // todo: send event
-                Mono.just(it)
+                // producer update book status
+                // producer update book catalog
+                // producer save point
+                it
             }
             .map {
                 rentalMapper.toDto(it)
@@ -92,9 +95,11 @@ class RentalServiceImpl(
                 it.returnBook(bookId)
                 rentalRepository.save(it)
             }
-            .flatMap {
+            .map {
                 // todo: send event
-                Mono.just(it)
+                // producer update book status
+                // producer update book catalog
+                it
             }
             .map {
                 rentalMapper.toDto(it)

@@ -57,12 +57,7 @@ data class RentedItem(
         private const val serialVersionUID = 1L
 
         fun createRentedItem(bookId: Long?, bookTitle: String?, rentedDate: LocalDate): RentedItem {
-            return RentedItem().apply {
-                this.bookId = bookId
-                this.bookTitle = bookTitle
-                this.rentedDate = rentedDate
-                this.dueDate = rentedDate.plusWeeks(2)
-            }
+            return RentedItem(bookId = bookId, bookTitle = bookTitle, rentedDate = rentedDate, dueDate = rentedDate.plusWeeks(2))
         }
     }
 }
